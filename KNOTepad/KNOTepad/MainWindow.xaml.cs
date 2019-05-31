@@ -27,58 +27,69 @@ namespace KNOTepad
         #endregion
 
         #region Размеры и положение окна
-        static double windowHeight;
-        static double windowWidth;
-        static double windowTop;
-        static double windowLeft;
+        private double _windowHeight;
+        private double _windowWidth;
+        private double _windowTop;
+        private double _windowLeft;
         #endregion
 
         #region IsDark
-        private bool isDark = false;
+        private bool _isDark = false;
         public bool IsDark
         {
-            get { return isDark; }
-            set { isDark = value; NotifyPropertyChanged(); }
+            get { return _isDark; }
+            set
+            {
+                _isDark = value;
+                NotifyPropertyChanged();
+            }
         }
         #endregion
 
-        private bool _currentisDark = false;
+        private bool _currentIsDark = false;
 
         private double _currentOpacity;
 
         #region RootOpacity
-        private double rootOpacity = 0.95;
+        private double _rootOpacity = 0.95;
 
         public double RootOpacity
         {
-            get { return rootOpacity; }
-            set { rootOpacity = value; NotifyPropertyChanged(); }
+            get { return _rootOpacity; }
+            set
+            {
+                _rootOpacity = value;
+                NotifyPropertyChanged();
+            }
         }
         #endregion
 
         #region WinState
-        private string wState = WindowState.Normal.ToString();
+        private string _wState = WindowState.Normal.ToString();
 
         public string WinState
         {
-            get { return wState; }
-            set { wState = value; NotifyPropertyChanged(); }
-        }
-        #endregion
-
-        string lastFile = "";
-        public string LastFile
-        {
-            get
-            {
-                return lastFile;
-            }
+            get { return _wState; }
             set
             {
-                lastFile = value;
+                _wState = value;
                 NotifyPropertyChanged();
             }
         }
+        #endregion
+
+        #region LastFile
+        string _lastFile = "";
+        public string LastFile
+        {
+            get { return _lastFile; }
+            set
+            {
+                _lastFile = value;
+                NotifyPropertyChanged();
+            }
+        }
+        #endregion
 
         public MainWindow()
         {
@@ -159,11 +170,11 @@ namespace KNOTepad
                 Configuration config = ConfigurationManager.OpenExeConfiguration(Assembly.GetEntryAssembly().Location);
                 AppSettingsSection appSettings = (AppSettingsSection)config.GetSection("appSettings");
                 appSettings.Settings.Clear();
-                appSettings.Settings.Add("WindowTop", windowTop.ToString());
-                appSettings.Settings.Add("WindowLeft", windowLeft.ToString());
-                appSettings.Settings.Add("WindowHeight", windowHeight.ToString());
-                appSettings.Settings.Add("WindowWidth", windowWidth.ToString());
-                appSettings.Settings.Add("LastFile", lastFile);
+                appSettings.Settings.Add("WindowTop", _windowTop.ToString());
+                appSettings.Settings.Add("WindowLeft", _windowLeft.ToString());
+                appSettings.Settings.Add("WindowHeight", _windowHeight.ToString());
+                appSettings.Settings.Add("WindowWidth", _windowWidth.ToString());
+                appSettings.Settings.Add("LastFile", _lastFile);
                 appSettings.Settings.Add("WindowState", WinState.ToString());
                 appSettings.Settings.Add("IsDark", IsDark.ToString());
                 appSettings.Settings.Add("Topmost", this.Topmost.ToString());
@@ -188,10 +199,10 @@ namespace KNOTepad
         {
             if (App.Current.MainWindow.WindowState == WindowState.Normal)
             {
-                windowHeight = this.Height;
-                windowWidth = this.Width;
-                windowTop = this.Top;
-                windowLeft = this.Left;
+                _windowHeight = this.Height;
+                _windowWidth = this.Width;
+                _windowTop = this.Top;
+                _windowLeft = this.Left;
             }
         }
         #endregion
@@ -200,22 +211,28 @@ namespace KNOTepad
         {
             try
             {
-                this.Height = Int32.Parse(ConfigurationManager.AppSettings["WindowHeight"]);
-                this.Width = Int32.Parse(ConfigurationManager.AppSettings["WindowWidth"]);
-                this.Top = Int32.Parse(ConfigurationManager.AppSettings["WindowTop"]);
-                this.Left = Int32.Parse(ConfigurationManager.AppSettings["WindowLeft"]);
+                this.Height = double.Parse(ConfigurationManager.AppSettings["WindowHeight"]);
+                this.Width = double.Parse(ConfigurationManager.AppSettings["WindowWidth"]);
+                this.Top = double.Parse(ConfigurationManager.AppSettings["WindowTop"]);
+                this.Left = double.Parse(ConfigurationManager.AppSettings["WindowLeft"]);
 
                 this.IsDark = bool.Parse(ConfigurationManager.AppSettings["isDark"]);
                 new PaletteHelper().SetLightDark(this.IsDark);
 
                 this.Topmost = bool.Parse(ConfigurationManager.AppSettings["Topmost"]);
 
-                var wState = ConfigurationManager.AppSettings["WindowState"];
-                if (wState == WindowState.Normal.ToString())
-                    App.Current.MainWindow.WindowState = WindowState.Normal;
-                else if (wState == WindowState.Maximized.ToString())
-                    App.Current.MainWindow.WindowState = WindowState.Maximized;
-                WinState = App.Current.MainWindow.WindowState.ToString();
+                Enum.TryParse(ConfigurationManager.AppSettings["WindowState"], out WindowState windowState);
+                switch (windowState)
+                {
+                    case WindowState.Normal:
+                    case WindowState.Maximized:
+                        Application.Current.MainWindow.WindowState = windowState;
+                        break;
+                    case WindowState.Minimized:
+                    default:
+                        break;
+                }
+                WinState = Application.Current.MainWindow.WindowState.ToString();
 
                 this.SaveWindowParamsMethod();
             }
@@ -253,7 +270,7 @@ namespace KNOTepad
 
         private void OpenSettings_Click(object sender, RoutedEventArgs e)
         {
-            _currentisDark = this.IsDark;
+            _currentIsDark = this.IsDark;
             _currentOpacity = this.Opacity;
             rootDialogHost.IsOpen = true;
         }
@@ -265,7 +282,7 @@ namespace KNOTepad
 
         private void CancelOptions_Click(object sender, RoutedEventArgs e)
         {
-            this.IsDark = _currentisDark;
+            this.IsDark = _currentIsDark;
             this.Opacity = _currentOpacity;
             new PaletteHelper().SetLightDark(this.IsDark);
             rootDialogHost.IsOpen = false;

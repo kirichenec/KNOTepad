@@ -172,6 +172,8 @@ namespace KNOTepad
             }
             catch
             {
+                SnackbarMessages.MessageQueue = SnackbarMessages.MessageQueue ?? new SnackbarMessageQueue();
+                SnackbarMessages.MessageQueue.Enqueue("Maybe there is no spoon on closing");
             }
 
         }
@@ -218,7 +220,10 @@ namespace KNOTepad
                 this.SaveWindowParamsMethod();
             }
             catch
-            { }
+            {
+                SnackbarMessages.MessageQueue = SnackbarMessages.MessageQueue ?? new SnackbarMessageQueue();
+                SnackbarMessages.MessageQueue.Enqueue("Maybe there is no spoon on load");
+            }
         }
 
         private void NewFile_Click(object sender, RoutedEventArgs e)

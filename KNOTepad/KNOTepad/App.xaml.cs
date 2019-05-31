@@ -31,7 +31,9 @@ namespace KNOTepad
                         windowLeft = Int32.Parse(ConfigurationManager.AppSettings["WindowLeft"]);
                     }
                     catch
-                    { }
+                    {
+                        // default values
+                    }
 
                     try
                     {
@@ -48,6 +50,7 @@ namespace KNOTepad
                     }
                     catch
                     {
+                        // default values
                     }
                 }
             }

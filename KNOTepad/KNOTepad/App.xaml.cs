@@ -15,30 +15,18 @@ namespace KNOTepad
         {
             if (e.Args.Length == 1)
             {
-                FileInfo file = new FileInfo(e.Args[0]);
-                if (file.Exists) //make sure it's actually a file
+                var file = new FileInfo(e.Args[0]);
+                if (file.Exists)
                 {
-                    double windowHeight = 0;
-                    double windowWidth = 0;
-                    double windowTop = 0;
-                    double windowLeft = 0;
-
                     try
                     {
-                        windowHeight = Int32.Parse(ConfigurationManager.AppSettings["WindowHeight"]);
-                        windowWidth = Int32.Parse(ConfigurationManager.AppSettings["WindowWidth"]);
-                        windowTop = Int32.Parse(ConfigurationManager.AppSettings["WindowTop"]);
-                        windowLeft = Int32.Parse(ConfigurationManager.AppSettings["WindowLeft"]);
-                    }
-                    catch
-                    {
-                        // default values
-                    }
+                        double.TryParse(ConfigurationManager.AppSettings["WindowHeight"], out var windowHeight);
+                        double.TryParse(ConfigurationManager.AppSettings["WindowWidth"], out var windowWidth);
+                        double.TryParse(ConfigurationManager.AppSettings["WindowTop"], out var windowTop);
+                        double.TryParse(ConfigurationManager.AppSettings["WindowLeft"], out var windowLeft);
 
-                    try
-                    {
-                        Configuration config = ConfigurationManager.OpenExeConfiguration(Assembly.GetEntryAssembly().Location);
-                        AppSettingsSection appSettings = (AppSettingsSection)config.GetSection("appSettings");
+                        var config = ConfigurationManager.OpenExeConfiguration(Assembly.GetEntryAssembly().Location);
+                        var appSettings = (AppSettingsSection)config.GetSection("appSettings");
                         appSettings.Settings.Clear();
                         appSettings.Settings.Add("WindowTop", windowTop.ToString());
                         appSettings.Settings.Add("WindowLeft", windowLeft.ToString());
